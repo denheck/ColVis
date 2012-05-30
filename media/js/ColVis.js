@@ -354,74 +354,79 @@ ColVis.prototype = {
 			
 			that.fnRebuild();
 		} );
+
+        /*
+         *  Make sure table resizes correctly with window
+         */
+        this._fnResizeTableWidth();
 	},
-	
-	
+
+
 	/**
 	 * Apply any customisation to the settings from the DataTables initialisation
 	 *  @method  _fnApplyCustomisation
 	 *  @returns void
-	 *  @private 
+	 *  @private
 	 */
 	"_fnApplyCustomisation": function ()
 	{
 		var oConfig = this.s.oInit;
-		
+
 		if ( typeof oConfig.activate != 'undefined' )
 		{
 			this.s.activate = oConfig.activate;
 		}
-		
+
 		if ( typeof oConfig.buttonText != 'undefined' )
 		{
 			this.s.buttonText = oConfig.buttonText;
 		}
-		
+
 		if ( typeof oConfig.aiExclude != 'undefined' )
 		{
 			this.s.aiExclude = oConfig.aiExclude;
 		}
-		
+
 		if ( typeof oConfig.bRestore != 'undefined' )
 		{
 			this.s.bRestore = oConfig.bRestore;
 		}
-		
+
 		if ( typeof oConfig.sRestore != 'undefined' )
 		{
 			this.s.sRestore = oConfig.sRestore;
 		}
-		
+
 		if ( typeof oConfig.bShowAll != 'undefined' )
 		{
 			this.s.bShowAll = oConfig.bShowAll;
 		}
-		
+
 		if ( typeof oConfig.sShowAll != 'undefined' )
 		{
 			this.s.sShowAll = oConfig.sShowAll;
 		}
-		
+
 		if ( typeof oConfig.sAlign != 'undefined' )
 		{
 			this.s.sAlign = oConfig.sAlign;
 		}
-		
+
 		if ( typeof oConfig.fnStateChange != 'undefined' )
 		{
 			this.s.fnStateChange = oConfig.fnStateChange;
 		}
-		
+
 		if ( typeof oConfig.iOverlayFade != 'undefined' )
 		{
 			this.s.iOverlayFade = oConfig.iOverlayFade;
 		}
-		
+
 		if ( typeof oConfig.fnLabel != 'undefined' )
 		{
 			this.s.fnLabel = oConfig.fnLabel;
 		}
-		
+
 		if ( typeof oConfig.sSize != 'undefined' )
 		{
 			this.s.sSize = oConfig.sSize;
@@ -432,19 +437,19 @@ ColVis.prototype = {
 			this.s.bCssPosition = oConfig.bCssPosition;
 		}
 	},
-	
-	
+
+
 	/**
 	 * On each table draw, check the visibility checkboxes as needed. This allows any process to
 	 * update the table's column visibility and ColVis will still be accurate.
 	 *  @method  _fnDrawCallback
 	 *  @returns void
-	 *  @private 
+	 *  @private
 	 */
 	"_fnDrawCallback": function ()
 	{
 		var aoColumns = this.s.dt.aoColumns;
-		
+
 		for ( var i=0, iLen=aoColumns.length ; i<iLen ; i++ )
 		{
 			if ( this.dom.buttons[i] !== null )
@@ -460,8 +465,8 @@ ColVis.prototype = {
 			}
 		}
 	},
-	
-	
+
+
 	/**
 	 * Loop through the columns in the table and as a new button for each one.
 	 *  @method  _fnAddButtons
@@ -901,7 +906,36 @@ ColVis.prototype = {
 		for ( var i=0, iLen=aoOpen.length ; i<iLen ; i++ ) {
 			aoOpen[i].nTr.getElementsByTagName('td')[0].colSpan = iVisible;
 		}
-	}
+	},
+
+    /**
+     * Used for fixing the width of the datatable when the window is resized and when plugin is initialized
+     * @method _fnResizeTableWidth
+     * @returns void
+     * @private
+     */
+	"_fnResizeTableWidth": function ()
+    {
+        var that = this;
+        var resizeTableWidth = function () {
+            var tableElement = that.s.dt.nTable;
+            var tableElementWidth = $(tableElement).width();
+            var tableElementParentWidth = $(tableElement).parent().width();
+
+            if (tableElementWidth != tableElementParentWidth) {
+                $(tableElement).width(tableElementParentWidth);
+            }
+        };
+
+        $(window).resize(resizeTableWidth);
+
+
+		/* Update init */
+		this.s.dt.aoInitComplete.push( {
+			"fn": resizeTableWidth,
+			"sName": "ColVis"
+		} );
+    }
 };
 
 
@@ -992,7 +1026,7 @@ ColVis.prototype.VERSION = ColVis.VERSION;
  */
 if ( typeof $.fn.dataTable == "function" &&
      typeof $.fn.dataTableExt.fnVersionCheck == "function" &&
-     $.fn.dataTableExt.fnVersionCheck('1.7.0') )
+     $.fn.dataTableExt.fnVersionCheck('1.9.1') )
 {
 	$.fn.dataTableExt.aoFeatures.push( {
 		"fnInit": function( oDTSettings ) {
@@ -1007,7 +1041,7 @@ if ( typeof $.fn.dataTable == "function" &&
 }
 else
 {
-	alert( "Warning: ColVis requires DataTables 1.7 or greater - www.datatables.net/download");
+	alert( "Warning: ColVis requires DataTables 1.9.1 or greater - www.datatables.net/download");
 }
 
 })(jQuery);
